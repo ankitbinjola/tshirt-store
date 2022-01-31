@@ -1,0 +1,53 @@
+openapi: 3.0.0
+info:
+  title: tshirt store project
+  description: tshirt ecom store.
+  version: 0.1.9
+  contact:
+    email: abinjola.binjola@gmail.com
+    url: "https://ankitbinjola.com"
+
+servers:
+  - url: "{protocol}://localhost:4000/api/{version}"
+    description: for local server
+    variables:
+      version:
+        enum:
+          - v1
+          - v2
+        default: v1
+      protocol:
+        enum:
+          - http
+          - https
+        default: http
+          
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+paths:
+  /dummy:
+    get:
+      tags:
+        - String
+      summary: returns a greeting msg from tshirt store
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "mystring"
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error

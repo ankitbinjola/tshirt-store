@@ -1,13 +1,5 @@
 const app = require('./app');
-require('dotenv').config();
 
-// bringing rourtes
-
-const home = require('./routes/home');
-
-
-//using middleware to route
-app.use('/api/v1', home);
 
 
 

@@ -29,11 +29,11 @@ const userSchema = new mongoose.Schema({
     photo : {
         id: {
             type: String,
-            required: true
+            required: false
         },
         secure_url: {
             type: String,
-            required: true
+            required: false
         }
     },
     forgotPasswordToken : String,
@@ -47,10 +47,11 @@ const userSchema = new mongoose.Schema({
 
 //encrypt password before save
 
-userSchema.pre('save', async (next) => {
+userSchema.pre('save', async function (next)  {
     if (!this.isModified('password')){
         return next();
     }
+    console.log(this.isModified('password'));
     this.password = await bcrypt.hash(this.password, 10)
 });
 

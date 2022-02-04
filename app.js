@@ -8,7 +8,13 @@ const user = require('./routes/user');
 const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = YAML.load('./swagger.yaml');
+const connect = require('./config/db');
+
+connect();
+
 const app = express();
+
+
 
 
 

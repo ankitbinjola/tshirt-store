@@ -8,9 +8,21 @@ const user = require('./routes/user');
 const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = YAML.load('./swagger.yaml');
-const connect = require('./config/db');
+const connectWithDb = require('./config/db');
+const cloudinary = require('cloudinary');
 
-connect();
+
+// CLOUDINARY_API_KEY=944145249987717
+// CLOUDINARY_API_SECRET=_lgYYL7scKMfOgmlnpbQiFr_7g0
+
+connectWithDb();
+
+
+cloudinary.config({ 
+    cloud_name: process.env.CLOUDINARY_NAME, 
+    api_key: process.env.CLOUDINARY_API_KEY, 
+    api_secret: process.env.CLOUDINARY_API_SECRET 
+  });
 
 const app = express();
 
@@ -28,7 +40,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(cookieParser());
 
 //fileupload middleware
-app.use(fileUpload());
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir : "/tmp/"
+}));
 
 // bringing rourtes
 app.use(morgan('tiny'));

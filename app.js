@@ -15,6 +15,9 @@ const cloudinary = require('cloudinary');
 // CLOUDINARY_API_KEY=944145249987717
 // CLOUDINARY_API_SECRET=_lgYYL7scKMfOgmlnpbQiFr_7g0
 
+
+
+
 connectWithDb();
 
 
@@ -28,8 +31,8 @@ const app = express();
 
 
 
-
-
+//template engine middleware
+app.set("view engine", "ejs");
 
 //middleware
 app.use(express.json());
@@ -53,6 +56,10 @@ app.use(morgan('tiny'));
 
 app.use('/api/v1', home);
 app.use('/api/v1', user);
+
+app.get('/signuptest', (req, res) => {
+  res.render('signuptest.ejs')
+})
 
 
 

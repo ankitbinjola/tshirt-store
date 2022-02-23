@@ -4,7 +4,7 @@ const CustomError = require('../utils/customeError');
 const cookieToken  = require('../utils/cookieToken');
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary');
-
+const mailHelper = require('../utils/emailHelper');
 
 
 exports.signup = async( req, res , next) => {
@@ -96,4 +96,46 @@ exports.logout = async( req, res , next) => {
         success: true,
         message: 'loggedout successfully..'
     })
+}
+
+
+
+// forgot passwordController
+
+exports.forgotPassword = async( req, res , next) => {
+    try {
+       const {email} = req.body;
+      
+       if(!email){
+           return next(new CustomError('please enter correct user email', 400));
+       } 
+
+       const user = await User.findOne({email}); 
+       const forgotToken = user.getForgotPawwwordToken();
+       
+       await user.save({validateBeforeSave: false});
+        // user click on url
+
+        const myUrl = `${req.protocol}://${req.get("host")}/password/reset/${forgotToken}`
+        const message = `copy and paste url ${myUrl}`;
+       
+       await  mailHelper({
+        emailTo : user.email,
+        subject : "password reset message from Tstore",
+        message : message
+       })
+
+       res.status(200).json({
+           success: true,
+           message: 'email sent successfully'
+       })
+    
+    } catch (error) {
+        user.forgotPasswordToken = undefined;
+        user.forgorPasswordExpiry = undefined;
+        await user.save({validateBeforeSave: false});
+        
+        return next(new CustomError(`${error.message}`, 500));
+    }
+
 }

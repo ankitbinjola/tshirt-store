@@ -82,3 +82,18 @@ exports.login = async(req, res, next) => {
         console.log(error);
     }
 }
+
+
+
+exports.logout = async( req, res , next) => {
+    res.cookie('token', null , {
+        expires : new Date( Date.now()),
+        httpOnly : true
+    });
+
+    res.status(200).json({
+        status: 200,
+        success: true,
+        message: 'loggedout successfully..'
+    })
+}

@@ -52,7 +52,7 @@ userSchema.pre('save', async function (next)  {
         return next();
     }
     console.log(this.isModified('password'));
-    this.password = await bcrypt.hash(this.password, 10)
+    this.password = await bcrypt.hash(this.password, 10);
 });
 
 
@@ -61,8 +61,7 @@ userSchema.pre('save', async function (next)  {
 
 // validating the password with passed on user password
 userSchema.methods.isValdidatedPassword = async function (usersendPassword) {
-
-    console.log(this.password, "passord in bcrypt");
+    console.log(await bcrypt.compare(usersendPassword, this.password), "passord in bcrypt");
     return await bcrypt.compare(usersendPassword, this.password);
 }
 

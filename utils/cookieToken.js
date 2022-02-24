@@ -5,8 +5,8 @@ const cookieToken = async (res, user) => {
     try {
         const token =  await user.getJwtToken();
 
-        const options = {
-            expires : new Date( Date.now() + 3 * 60 *60 * 1000),
+        const options = { 
+            expires : new Date( Date.now() + 3 * 60 * 60 * 1000),
             httpOnly : true
         }
     

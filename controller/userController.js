@@ -1,11 +1,11 @@
 const User = require('../models/user');
 const BigPromise = require('../middleware/bigPromise');
-const CustomError = require('../utils/customeError');
+const CustomError = require('../utils/customError');
 const cookieToken  = require('../utils/cookieToken');
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary');
 const mailHelper = require('../utils/emailHelper');
-
+const crypto = require('crypto');
 
 exports.signup = async( req, res , next) => {
     try {
@@ -111,11 +111,11 @@ exports.forgotPassword = async( req, res , next) => {
        } 
 
        const user = await User.findOne({email}); 
-       const forgotToken = user.getForgotPawwwordToken();
+       const forgotToken = user.getForgotPasswordToken();
        
-       await user.save({validateBeforeSave: false});
+        await user.save({ validateBeforeSave : false});
         // user click on url
-
+       console.log(user);
         const myUrl = `${req.protocol}://${req.get("host")}/password/reset/${forgotToken}`
         const message = `copy and paste url ${myUrl}`;
        
@@ -125,10 +125,15 @@ exports.forgotPassword = async( req, res , next) => {
         message : message
        })
 
+
+
+
        res.status(200).json({
            success: true,
            message: 'email sent successfully'
        })
+        
+       console.log(user.forgotPasswordExpire);
     
     } catch (error) {
         user.forgotPasswordToken = undefined;
@@ -137,5 +142,58 @@ exports.forgotPassword = async( req, res , next) => {
         
         return next(new CustomError(`${error.message}`, 500));
     }
+
+}
+
+// password reset function
+
+exports.resetPassword = async( req, res , next) => {
+
+    try {
+        const token = req.params.token;
+        const encryToken = crypto.createHash('sha256').update(token).digest('hex');
+        console.log(encryToken);
+        const user = await User.findOne({encryToken, forgotPasswordExpire : { $gt : Date.now()}});
+        console.log(user);
+
+        if(!user){
+            return next(new CustomError('Token is invalid or expired', 400))
+        }
+
+        if(req.body.password !== req.body.confirmPassword){
+            return next(new CustomError('Password or confirm password do not match', 400));
+        }
+
+        user.password = req.body.password;
+
+        user.forgotPasswordToken = undefined;
+        user.forgorPasswordExpiry = undefined;
+
+        await user.save();
+
+        cookieToken(res, user);
+
+    } catch (error) {
+        return next(new CustomError(`${error.message}`, 500));
+    }
+
+}
+
+
+
+// getLoggedInUserDetail  function
+
+exports.getLoggedInUserDetail = async( req, res , next) => {
+
+    try {
+        const user = await User.findById(req.user.id);
+    res.status(200).json({
+    success: true,
+    user
+});
+    } catch (error) {
+        
+    }
+
 
 }

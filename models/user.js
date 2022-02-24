@@ -36,8 +36,10 @@ const userSchema = new mongoose.Schema({
             required: true
         }
     },
+
     forgotPasswordToken : String,
-    forgorPasswordExpiry : Date,
+    forgotPasswordExpire : Date,
+    
     CreatedAt : {
         type: Date,
         default : Date.now()
@@ -77,13 +79,13 @@ userSchema.methods.getJwtToken = async function () {
 
 
 // GENERATE FORGOT PASSWORD TOKEN 
-userSchema.methods.getForgotPawwwordToken = () => {
+userSchema.methods.getForgotPasswordToken = function() {
     // generate a long and random string
     const forgotToken = crypto.randomBytes(20).toString('hex');
 
-    this.forgotPasswordToken = crypto.createHash('sha256').update(forgotToken).digest('hex')
+    this.forgotPasswordToken = crypto.createHash('sha256').update(forgotToken).digest('hex');
 
-    this.forgotPasswordExpiry = Date.now() + 20 * 60 * 1000;
+    this.forgotPasswordExpire = Date.now() + 20  * 60 * 1000;
 
     return forgotToken;
 }

@@ -184,7 +184,6 @@ exports.resetPassword = async( req, res , next) => {
 // getLoggedInUserDetail  function
 
 exports.getLoggedInUserDetail = async( req, res , next) => {
-
     try {
         const user = await User.findById(req.user.id);
     res.status(200).json({
@@ -194,6 +193,48 @@ exports.getLoggedInUserDetail = async( req, res , next) => {
     } catch (error) {
         
     }
+}
+
+
+
+// getLoggedInUserDetail  function
+
+exports.changePassword = async( req, res , next) => {
+   try {
+    // getting id from request 
+    const userId = req.user.id;
+
+
+    // finding user by id
+    const user = await User.findById(userId).select("+password");
+    
+    //get password key from body
+    const password = req.body.password; 
+    
+    // validating if given old password is matching with the password present in db
+    const isUserPasswordValidated = await  user.isValdidatedPassword(password);;
+    
+
+    // if old password not matched with db return error
+    if(!isUserPasswordValidated){
+        return next(new CustomError('Old password does not matched with new password', 400));
+    }
+    
+        
+    // else store new password in the db;
+    user.password = req.body.newpassword;
+
+    // save new password in db
+    await user.save();
+
+    // send response using cookie function
+    cookieToken(res, user);
+
+   } catch (error) {
+    return next(new CustomError(`${error.message}`, 500));
+   }
 
 
 }
+
+

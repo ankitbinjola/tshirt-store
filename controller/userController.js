@@ -6,6 +6,7 @@ const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary');
 const mailHelper = require('../utils/emailHelper');
 const crypto = require('crypto');
+const mongoose = require('mongoose');
 
 exports.signup = async( req, res , next) => {
     try {
@@ -300,6 +301,32 @@ exports.adminAllUsers = async( req, res , next) => {
  }
 
 
+
+  // giving oneuser users detail
+exports.adminOneUsers = async( req, res , next) => {
+    try {
+       const userId = req.params.id;
+       const isIdValid = await mongoose.Types.ObjectId.isValid(userId);
+       
+       if(!isIdValid){
+           return next(new CustomError('given id is not valid'), 400);
+       }
+       
+       const user = await User.findById(userId);
+       console.log(user);
+        if(!user){
+            return next(new CustomError('user not found'), 404);
+        }
+       
+       res.status(200).json({
+           success: true,
+           user : user
+       })
+    } catch (error) {
+        return next(new CustomError(`${error.message}`, 500));
+    }
+ }
+
   // giving all users detail where role is user
 exports.managerAllUsers = async( req, res , next) => {
     try {
@@ -313,3 +340,78 @@ exports.managerAllUsers = async( req, res , next) => {
         return next(new CustomError(`${error.message}`, 500));
     }
  }
+
+
+
+
+ // updating user profile
+exports.adminUpdateUserDetails = async( req, res , next) => {
+ 
+    try {
+        const userId = req.params.id;
+        console.log(userId);
+
+        const newData = {
+            name : req.body.name,
+            email: req.body.email
+        };
+    
+        const userExists = await User.findById(userId);
+
+        if(!userExists){
+            return next(new CustomError('user does not exists'), 404);
+        }
+
+
+        if(req.files){
+            const userDetails = await User.findById(userId);
+            const imageId = userDetails.photo.id
+          const response =  await cloudinary.v2.uploader.destroy(imageId); 
+          const result = await cloudinary.v2.uploader.upload(req.files.photo.tempFilePath, {
+            folder: "tshirt",
+            width: 150,
+            crop: "scale"
+        });
+
+            newData.photo = {
+                id: result.public_id,
+                secure_url : result.secure_url
+            }
+
+        }
+
+        const user = await User.findByIdAndUpdate(userId, newData, {
+            new: true,
+            runValidators: true,
+            useFindAndModify:false
+        });
+
+        res.status(200).json({
+            success: true,
+            user: user
+        })
+
+    } catch (error) {
+        return next(new CustomError(`${error.message}`, 500));
+    }
+ 
+ }
+
+
+ exports.adminDeleteUsers = async(req, res , next) => {
+    try{
+        const deletedUserId = req.params.id ;
+        await User.deleteOne({_id: deletedUserId}) ;
+
+        res.status(200).json({
+            success: true,
+            message: 'user deleted..'
+        })
+
+    }catch (error) {
+        return next(new CustomError(`${error.message}`, 500));
+    }
+        
+
+ }
+ 

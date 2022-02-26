@@ -238,3 +238,78 @@ exports.changePassword = async( req, res , next) => {
 }
 
 
+// updating user profile
+exports.updateUserDetails = async( req, res , next) => {
+ 
+    try {
+        const userId = req.user.id ;
+
+        const newData = {
+            name : req.body.name,
+            email: req.body.email
+        };
+    
+        if(req.files){
+            const userDetails = await User.findById(userId);
+            const imageId = userDetails.photo.id
+          const response =  await cloudinary.v2.uploader.destroy(imageId); 
+          const result = await cloudinary.v2.uploader.upload(req.files.photo.tempFilePath, {
+            folder: "tshirt",
+            width: 150,
+            crop: "scale"
+        });
+
+            newData.photo = {
+                id: result.public_id,
+                secure_url : result.secure_url
+            }
+
+        }
+
+        const user = await User.findByIdAndUpdate(userId, newData, {
+            new: true,
+            runValidators: true,
+            useFindAndModify:false
+        });
+
+        res.status(200).json({
+            success: true,
+            user: user
+        })
+
+    } catch (error) {
+        return next(new CustomError(`${error.message}`, 500));
+    }
+ 
+ }
+
+
+
+ // giving all users detail
+exports.adminAllUsers = async( req, res , next) => {
+    try {
+       const userId = req.user.id;
+       const users = await User.find();
+       res.status(200).json({
+           success: true,
+           user : users
+       })
+    } catch (error) {
+        return next(new CustomError(`${error.message}`, 500));
+    }
+ }
+
+
+  // giving all users detail where role is user
+exports.managerAllUsers = async( req, res , next) => {
+    try {
+       const userId = req.user.id;
+       const users = await User.find({role : 'user'});
+       res.status(200).json({
+           success: true,
+           user : users
+       })
+    } catch (error) {
+        return next(new CustomError(`${error.message}`, 500));
+    }
+ }

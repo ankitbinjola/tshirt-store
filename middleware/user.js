@@ -24,3 +24,43 @@ exports.isLoggedIn = async (req, res, next) => {
     }
 }
 
+
+// only admin can have access to list users
+
+exports.adminCheck = (...roles) => {
+    try {
+        return(req, res, next) => {
+            if(!roles.includes(req.user.role)){
+                return next(new customError('you dont have admin access'), 403);
+            }
+            next();
+        }
+
+    //    return (req, res, next) =>{
+    //     if(req.user.role !== 'admin'){
+    //         return next(new customError('you dont have admin access'), 403);
+    //     }
+    //     next();
+    //    } 
+
+    } catch (error) {
+        return next(new customError(`${error.message}`, 500));
+    }
+}
+
+// only manager can have access to list users
+
+exports.managerCheck = (...roles) => {
+    try {
+        return(req, res, next) => {
+            if(!roles.includes(req.user.role)){
+                return next(new customError('you dont have manager access'), 403);
+            }
+            next();
+        }
+
+    } catch (error) {
+        return next(new customError(`${error.message}`, 500));
+    }
+}
+

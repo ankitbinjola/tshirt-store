@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const home = require('./routes/home');
 const user = require('./routes/user');
+const product = require('./routes/product');
 const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = YAML.load('./swagger.yaml');
@@ -50,12 +51,14 @@ app.use(fileUpload({
 
 // bringing rourtes
 app.use(morgan('tiny'));
+
+
+
 //using middleware to route
-
-
-
 app.use('/api/v1', home);
 app.use('/api/v1', user);
+app.use('/api/v1', product);
+
 
 app.get('/signuptest', (req, res) => {
   res.render('signuptest.ejs')

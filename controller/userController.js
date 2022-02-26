@@ -341,9 +341,6 @@ exports.managerAllUsers = async( req, res , next) => {
     }
  }
 
-
-
-
  // updating user profile
 exports.adminUpdateUserDetails = async( req, res , next) => {
  

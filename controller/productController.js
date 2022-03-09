@@ -65,6 +65,8 @@ const product = await Product.create(req.body);
 
 
 
+// with filter , searching and pagination
+
 exports.getAllProducts = async( req, res , next) => {
     try {
         const resultsPerPage = 2;
@@ -84,6 +86,27 @@ exports.getAllProducts = async( req, res , next) => {
             filteredProductCount,
             totalProductCount
         })
+
+    } catch (error) {
+        return next(new CustomError(`${error.message}`, 500));
+    }
+}
+
+
+// get single product details
+
+exports.getSingleProduct = async(req, res, next) => {
+    try {
+        if(!req.params.id){
+            return next(new CustomError('please provide id'), 400);
+        }
+        const product = await Product.findById(req.params.id);
+
+        res.status(200).json({
+            success: true,
+            product
+        })
+
 
     } catch (error) {
         return next(new CustomError(`${error.message}`, 500));

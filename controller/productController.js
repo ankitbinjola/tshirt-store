@@ -2,7 +2,7 @@ const Product = require('../models/productModel');
 const BigPromise = require('../middleware/bigPromise');
 const CustomError = require('../utils/customError');
 const cookieToken  = require('../utils/cookieToken');
-const whereClause  = require('../utils/whereClause');
+const WhereClause  = require('../utils/whereClause');
 const cloudinary = require('cloudinary');
 
 
@@ -67,28 +67,23 @@ const product = await Product.create(req.body);
 
 exports.getAllProducts = async( req, res , next) => {
     try {
+        const resultsPerPage = 2;
+        const totalProductCount = await Product.countDocuments()
+        let productsObject = new 
+            WhereClause(Product.find(), req.query).search().filter()
+          
+        const filteredProductCount = productsObject.base.length
+     
+        productsObject.pager(resultsPerPage)
         
-        const resultperpage = 6 ;
-        const totalCount = Product.countDocuments();
-
-
-        const products = new whereClause(Product.find(), req.query).search().filter();
-
-        const filteredProductsCount = products.length;
-
-        products.pager(resultperpage);
-
-        products = await products.base
-
-        const product = await Product.find({});
-
+        const products = await productsObject.base;
+     
         res.status(200).json({
             success: true,
-            product,
-            filteredProductsCount,
-            totalCount
+            products,
+            filteredProductCount,
+            totalProductCount
         })
-
 
     } catch (error) {
         return next(new CustomError(`${error.message}`, 500));

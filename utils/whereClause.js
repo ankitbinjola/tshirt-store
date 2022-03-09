@@ -3,7 +3,9 @@
 
 //bigQ = search=coder&page=2&category=shortssleeves&ratings[gte]=4&price[lte]=999&price[gte]=199 
 // for search
-class whereClause {
+class WhereClause {  
+ 
+ 
     constructor(base, bigQ){
         this.base = base;
         this.bigQ = bigQ;
@@ -17,15 +19,24 @@ class whereClause {
             }
         } : {} ;
         this.base = this.base.find({...searchword});
-        return this
+        
+        return this ;
+    
+    
     }
+
+
+
 
 
     pager(resultperpage){
         let currentPage = 1 ;
+        // console.log(resultperpage)
         if(this.bigQ.page){
             currentPage = this.bigQ.page;
         }
+
+        // console.log('this.base', this.base.limit(1));
 
         const skipVal = resultperpage * (currentPage - 1)
 
@@ -35,24 +46,35 @@ class whereClause {
     }
 
 
-    filter(){
-        const copyQ = {...this.bigQ};
-        delete copyQ[search];
-        delete copyQ[page];
-        delete copyQ[spage];
+    filter() {
+        // create copy of bigquery
+        const copyQuery = {...this.bigQuery}
+ 
+        // remove other filters
+        delete copyQuery["search"]
+        delete copyQuery["limit"]
+        delete copyQuery["page"]
+ 
+        let serializedQuery = JSON.stringify(copyQuery)
+ 
+        // change 'filter' to '$filter'
+        serializedQuery = serializedQuery.replace(
+            /\b(gte|lte)\b/g,
+            ///\b(gt|lt)\b/g,
+            (match) => `$${match}`
+        )
+ 
+        const deserializedQuery = JSON.parse(serializedQuery)
+ 
+        this.base = this.base.find(deserializedQuery)
 
-        //convert bigQ into a string => copyQ
-        let stringOfCopyQ = JSON.stringify(copyQ);
-        stringOfCopyQ = stringOfCopyQ.replace(/\b(gte|lte|gt|lt)\b/g, m => `$${m}`);
-        jsonOfCopyQ = JSON.parse(stringOfCopyQ);
-        
-        this.base = this.base.find(jsonOfCopyQ); 
-
+        return this;
     }
+ 
 
 }
 
 
-module.exports = whereClause;
+module.exports = WhereClause;
 
 

@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const home = require('./routes/home');
 const user = require('./routes/user');
+const payment = require('./routes/payment');
 const product = require('./routes/product');
 const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express');
@@ -58,6 +59,7 @@ app.use(morgan('tiny'));
 app.use('/api/v1', home);
 app.use('/api/v1', user);
 app.use('/api/v1', product);
+app.use('/api/v1', payment);
 
 
 app.get('/signuptest', (req, res) => {

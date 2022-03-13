@@ -268,4 +268,65 @@ exports.reviewProduct = async( req, res , next) => {
 
 
 
+exports.listProductReviews = async( req, res , next) => {
+
+    try {
+        if(!req.params.id){
+            return next(new CustomError('no product found with the given id', 400));
+        }
+
+
+        let product = await Product.findById(req.params.id);
+
+        let productReviews = product.reviews;
+
+
+
+        res.status(200).json({
+            success: true,
+            productReviews
+        })
+
+    } catch (error) {
+        return next(new CustomError(`${error.message}`, 500));
+    }
+
+}
+
+
+exports.deleteProductReview = async( req, res , next) => {
+    try {
+        reviewId = req.body.id;
+        let product = await Product.findById(req.params.id)
+
+        let productReviews = product.reviews;
+
+        let newReviewArray = [];
+        productReviews.forEach((review) => {
+            if(review._id.toString() != (reviewId.toString())){
+             newReviewArray.push(review);
+            } 
+        })
+
+        
+      let updatedRatings = newReviewArray.reduce((acc, item) => acc + item.rating, 0)/ newReviewArray.length;
+        
+        product.reviews = newReviewArray;
+        product.ratings = updatedRatings;
+        product.noOfReviews = newReviewArray.length;
+
+      let result = await product.save();
+
+
+        res.status(200).json({
+            success: true,
+            result
+        })
+
+    } catch (error) {
+        return next(new CustomError(`${error.message}`, 500));
+    }
+}
+
+
 

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-import QueenPosition from '../../javascript-algorithms/src/algorithms/uncategorized/n-queens/QueenPosition';
+
 // shippinginfo{}
 // user
 // payment info{}
@@ -32,7 +32,7 @@ shippinginfo : {
         type: String,
         required: true
     }, 
-       State : {
+       state : {
         type: String,
         required: true
     },
@@ -51,7 +51,7 @@ orderItems : [
         type: String, 
         required: true
         },
-    qauantity: {
+    quantity: {
         type: Number, 
         required: true
         }, 
@@ -93,11 +93,11 @@ orderStatus: {
     default: 'processing'
 },
 deliveredAt: {
-    type : Date,
-    required: true
+    type : Date
 },
 CreatedAt: {
-    type : Date.now,
+    type : Date,
+    default: Date.now,
     required: true
 }
 

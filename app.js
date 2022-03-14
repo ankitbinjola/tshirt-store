@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const home = require('./routes/home');
 const user = require('./routes/user');
+const order = require('./routes/order');
 const payment = require('./routes/payment');
 const product = require('./routes/product');
 const YAML = require('yamljs');
@@ -60,6 +61,7 @@ app.use('/api/v1', home);
 app.use('/api/v1', user);
 app.use('/api/v1', product);
 app.use('/api/v1', payment);
+app.use('/api/v1', order);
 
 
 app.get('/signuptest', (req, res) => {

@@ -95,7 +95,7 @@ exports.logout = async( req, res , next) => {
     res.status(200).json({
         status: 200,
         success: true,
-        message: 'loggedout successfully..'
+        message: 'loggedout successfully..horray'
     })
 }
 
